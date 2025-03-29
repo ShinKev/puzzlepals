@@ -9,7 +9,6 @@ android {
 
     defaultConfig {
         minSdk = 23
-        targetSdk = 34
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -60,6 +59,10 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material.icons.extended)
+    
+    // Coil
+    implementation(libs.coil.compose)
     
     // Testing
     testImplementation(libs.junit)

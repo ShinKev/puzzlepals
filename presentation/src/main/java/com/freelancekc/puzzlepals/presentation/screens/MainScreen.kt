@@ -1,4 +1,4 @@
-package com.freelancekc.puzzlepals.presentation.navigation
+package com.freelancekc.puzzlepals.presentation.screens
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.freelancekc.puzzlepals.presentation.navigation.BottomNavItem
 import com.freelancekc.puzzlepals.presentation.screens.creation.CreationScreen
 import com.freelancekc.puzzlepals.presentation.screens.feed.FeedAndSearchScreen
 import com.freelancekc.puzzlepals.presentation.screens.home.HomeScreen
