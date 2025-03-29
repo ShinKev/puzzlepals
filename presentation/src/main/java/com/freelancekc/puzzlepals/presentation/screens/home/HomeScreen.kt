@@ -4,13 +4,39 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,7 +49,6 @@ import androidx.compose.ui.unit.sp
 import com.freelancekc.puzzlepals.presentation.R
 import java.util.Calendar
 import java.util.Locale
-import androidx.compose.foundation.shape.CircleShape
 
 private fun Calendar.toEpochMillis(): Long {
     return this.timeInMillis
@@ -59,7 +84,7 @@ private fun DateDisplay(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -114,15 +139,29 @@ private fun PaginationDots(
 @Composable
 private fun ImageCarousel(
     images: List<Int>,
+    currentPage: Int,
+    onPageChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val pagerState = rememberPagerState(pageCount = { images.size })
+    val pagerState = rememberPagerState(
+        pageCount = { images.size },
+        initialPage = images.size - 1
+    )
+    
+    LaunchedEffect(pagerState.currentPage) {
+        onPageChanged(pagerState.currentPage)
+    }
 
+    LaunchedEffect(currentPage) {
+        if (currentPage != pagerState.currentPage) {
+            pagerState.animateScrollToPage(currentPage)
+        }
+    }
+    
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(400.dp)
-            .padding(horizontal = 16.dp)
     ) {
         HorizontalPager(
             state = pagerState,
@@ -131,7 +170,7 @@ private fun ImageCarousel(
             Card(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 32.dp),
                 elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Image(
@@ -198,12 +237,20 @@ private fun DatePickerDialog(
 fun HomeScreen() {
     var showDatePicker by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
+    var currentPage by remember { mutableStateOf(2) } // Start at the last page
 
     val images = listOf(
         R.drawable.sample_puzzle1,
         R.drawable.sample_puzzle2,
         R.drawable.sample_puzzle3
     )
+
+    // Update date when page changes
+    LaunchedEffect(currentPage) {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_MONTH, -(images.size - 1 - currentPage))
+        selectedDate = calendar
+    }
 
     Scaffold(
         topBar = {
@@ -226,7 +273,11 @@ fun HomeScreen() {
             verticalArrangement = Arrangement.Center
         ) {
             DateDisplay(date = selectedDate)
-            ImageCarousel(images = images)
+            ImageCarousel(
+                images = images,
+                currentPage = currentPage,
+                onPageChanged = { currentPage = it }
+            )
         }
     }
 
@@ -234,7 +285,17 @@ fun HomeScreen() {
         showDialog = showDatePicker,
         selectedDate = selectedDate,
         onDismiss = { showDatePicker = false },
-        onDateSelected = { selectedDate = it }
+        onDateSelected = { 
+            selectedDate = it
+            // Calculate the page based on the selected date
+            val today = Calendar.getInstance()
+            val diffInMillis = today.timeInMillis - it.timeInMillis
+            val diffInDays = (diffInMillis / (24 * 60 * 60 * 1000)).toInt()
+            val newPage = (images.size - 1 - diffInDays).coerceIn(0, images.size - 1)
+            if (newPage != currentPage) {
+                currentPage = newPage
+            }
+        }
     )
 }
 
