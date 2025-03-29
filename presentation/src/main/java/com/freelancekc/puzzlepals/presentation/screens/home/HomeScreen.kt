@@ -91,6 +91,10 @@ fun HomeScreen() {
             if (newPage != currentPage) {
                 currentPage = newPage
             }
+        },
+        onSubscribeToPremium = {
+            // TODO: Navigate to premium subscription screen
+            showDatePicker = false
         }
     )
 }
