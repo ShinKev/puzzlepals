@@ -23,6 +23,7 @@ import com.freelancekc.puzzlepals.presentation.components.CalendarButton
 import com.freelancekc.puzzlepals.presentation.components.DateDisplay
 import com.freelancekc.puzzlepals.presentation.components.ImageCarousel
 import com.freelancekc.puzzlepals.presentation.components.DatePickerDialog
+import com.freelancekc.puzzlepals.presentation.components.PlayButton
 import java.util.Calendar
 
 @Composable
@@ -47,7 +48,7 @@ fun HomeScreen() {
                 .padding(paddingValues)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -72,7 +73,13 @@ fun HomeScreen() {
                     val calendar = Calendar.getInstance()
                     calendar.add(Calendar.DAY_OF_MONTH, -(images.size - 1 - page))
                     selectedDate = calendar
-                }
+                },
+                modifier = Modifier.weight(1f)
+            )
+
+            PlayButton(
+                onClick = { /* TODO: Navigate to puzzle screen */ },
+                modifier = Modifier.padding(top = 24.dp)
             )
         }
     }
