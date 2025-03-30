@@ -120,7 +120,9 @@ private fun BoxScope.PuzzlePager(
                 }
 
                 LikesCount(
-                    modifier = Modifier.align(alignment = Alignment.TopStart),
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopStart)
+                        .padding(12.dp),
                     likesCount = puzzles[page].likes
                 )
             }
