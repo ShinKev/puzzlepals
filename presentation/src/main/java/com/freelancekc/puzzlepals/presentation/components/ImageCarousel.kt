@@ -3,7 +3,6 @@ package com.freelancekc.puzzlepals.presentation.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,7 +27,7 @@ import com.freelancekc.puzzlepals.presentation.R
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageCarousel(
-    images: List<Int>,
+    images: List<Int>, // should be List<String> if not mocked
     currentPage: Int,
     onPageChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -62,7 +61,7 @@ fun ImageCarousel(
                 )
             ) {
                 Image(
-                    painter = painterResource(id = images[page]),
+                    painter = painterResource(images[page]), // rememberAsyncImagePainter(images[page]),
                     contentDescription = "Puzzle image ${page + 1}",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop

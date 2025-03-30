@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -23,11 +24,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     testOptions {
         targetSdk = 34
@@ -40,6 +41,9 @@ android {
 dependencies {
     // Core Android
     implementation(libs.androidx.core.ktx)
+
+    // Dependency Injection
+    implementation(libs.javax.inject)
     
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
