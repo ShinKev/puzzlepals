@@ -1,13 +1,18 @@
 package com.freelancekc.puzzlepals.presentation.screens.puzzle
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,31 +29,33 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.toSize
-import androidx.navigation.NavBackStackEntry
-import com.freelancekc.puzzlepals.presentation.R
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.freelancekc.puzzlepals.domain.model.PuzzlePiece
+import com.freelancekc.puzzlepals.presentation.R
 import com.freelancekc.puzzlepals.presentation.components.DraggablePiece
 import com.freelancekc.puzzlepals.presentation.utils.PuzzleGenerator
-import android.graphics.drawable.BitmapDrawable
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun PuzzleScreen(
-    backStackEntry: NavBackStackEntry,
+    viewModel: PuzzleViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
-    val puzzleId = backStackEntry.arguments?.getString("puzzleId")
-        ?: return // This should be used in the viewModel to fetch the puzzle details
     val context = LocalContext.current
     val density = LocalDensity.current
 
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var screenSize by remember { mutableStateOf(Size.Zero) }
     var imageSize by remember { mutableStateOf(Size.Zero) }
 
+    val puzzle by viewModel.puzzle.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
+
     // Load bitmap image
-    LaunchedEffect(Unit) {
+    LaunchedEffect(puzzle) {
         try {
+            // Local image instead of URL since this is a prototype
             val drawable = context.getDrawable(R.drawable.sample_puzzle3)
             bitmap = (drawable as BitmapDrawable).bitmap
         } catch (e: Exception) {
@@ -57,28 +64,57 @@ fun PuzzleScreen(
     }
 
     // Generate puzzle pieces
-    val puzzlePieces = remember(bitmap, imageSize) {
+    val puzzlePieces = remember(bitmap, imageSize, puzzle) {
         if (imageSize == Size.Zero) return@remember emptyList()
         val loadedBitmap = bitmap ?: return@remember emptyList()
-        PuzzleGenerator.generatePuzzlePieces(3, 3, loadedBitmap, imageSize, density)
+        val puzzleRows = puzzle?.rows ?: return@remember emptyList()
+        val puzzleColumns = puzzle?.columns ?: return@remember emptyList()
+        PuzzleGenerator.generatePuzzlePieces(
+            puzzleRows,
+            puzzleColumns,
+            loadedBitmap,
+            imageSize,
+            screenSize,
+            density
+        )
     }
 
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .onSizeChanged { screenSize = it.toSize() },
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(0.85f).fillMaxHeight(0.6f),
-            contentAlignment = Alignment.Center
-        ) {
-            if (bitmap != null) {
-                PuzzleBackground(
-                    bitmap = bitmap!!,
-                    onSizeChanged = { imageSize = it }
+        when {
+            isLoading -> {
+                CircularProgressIndicator()
+            }
+            error != null -> {
+                Text(
+                    text = error ?: "An error occurred",
+                    color = MaterialTheme.colorScheme.error
                 )
-                if (imageSize != Size.Zero) {
-                    PuzzlePieces(pieces = puzzlePieces)
+            }
+            puzzle != null -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(0.85f).fillMaxHeight(0.6f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (bitmap != null) {
+                            PuzzleBackground(
+                                bitmap = bitmap!!,
+                                onSizeChanged = { imageSize = it }
+                            )
+                            if (imageSize != Size.Zero) {
+                                PuzzlePieces(pieces = puzzlePieces)
+                            }
+                        }
+                    }
                 }
             }
         }

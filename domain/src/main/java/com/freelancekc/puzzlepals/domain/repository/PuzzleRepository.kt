@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface PuzzleRepository {
     fun getRecentPuzzles(): Flow<List<Puzzle>>
+    suspend fun getPuzzleById(id: String): Puzzle?
 } 

@@ -14,21 +14,23 @@ object PuzzleGenerator {
         columns: Int,
         bitmap: Bitmap,
         imageSize: Size,
+        screenSize: Size,
         density: Density
     ): List<PuzzlePiece> {
         val croppedBitmap = ImageProcessor.scaleAndCropBitmap(bitmap, imageSize)
         val pieces = PuzzleImageSplitter.splitImage(croppedBitmap, rows, columns)
-        return shufflePieces(pieces, imageSize, density)
+        return shufflePieces(pieces, screenSize, density)
     }
 
     private fun shufflePieces(
         pieces: List<PuzzlePiece>,
-        imageSize: Size,
+        screenSize: Size,
         density: Density
     ): List<PuzzlePiece> {
-        val screenWidth = imageSize.width.toInt()
-        val screenHeight = imageSize.height.toInt()
-        val padding = with(density) { 50.dp.toPx().toInt() }
+        val screenWidth = screenSize.width.toInt()
+        val screenHeight = screenSize.height.toInt()
+
+        val padding = with(density) { 10.dp.toPx().toInt() }
 
         return pieces.map { piece ->
             val newX = Random.nextInt(padding, screenWidth - piece.pieceSize.width - padding)
