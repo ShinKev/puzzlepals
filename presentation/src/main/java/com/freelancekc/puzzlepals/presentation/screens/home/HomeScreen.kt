@@ -94,15 +94,6 @@ private fun HomeContent(
     setCurrentPage: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    // Offline images to be able to display something
-    val sampleImages = remember {
-        listOf(
-            R.drawable.sample_puzzle1,
-            R.drawable.sample_puzzle2,
-            R.drawable.sample_puzzle3
-        )
-    }
-
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -132,7 +123,7 @@ private fun HomeContent(
             )
 
             ImageCarousel(
-                images = sampleImages, // should be puzzles.map { it.imageUrl },
+                puzzles = puzzles,
                 currentPage = currentPage,
                 onPageChanged = { page ->
                     setCurrentPage(page)
@@ -172,9 +163,38 @@ private fun calculatePageForDate(date: Calendar, puzzlesSize: Int): Int {
 @Preview(showBackground = true)
 @Composable
 fun HomeContentPreview() {
+    val samplePuzzles = remember {
+        listOf(
+            Puzzle(
+                id = "1",
+                imageUrl = R.drawable.sample_puzzle1.toString(),
+                date = Calendar.getInstance(),
+                rows = 3,
+                columns = 3,
+                likes = 42
+            ),
+            Puzzle(
+                id = "2",
+                imageUrl = R.drawable.sample_puzzle2.toString(),
+                date = Calendar.getInstance(),
+                rows = 3,
+                columns = 3,
+                likes = 15
+            ),
+            Puzzle(
+                id = "3",
+                imageUrl = R.drawable.sample_puzzle3.toString(),
+                date = Calendar.getInstance(),
+                rows = 3,
+                columns = 3,
+                likes = 7
+            )
+        )
+    }
+
     MaterialTheme {
         HomeContent(
-            puzzles = listOf(),
+            puzzles = samplePuzzles,
             selectedDate = Calendar.getInstance(),
             currentPage = 1
         )

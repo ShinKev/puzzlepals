@@ -24,7 +24,8 @@ class PuzzleRemoteDataSourceImpl @Inject constructor(
         imageUrl = "R.drawable.sample_puzzle1",
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -2) },
         rows = 3,
-        columns = 3
+        columns = 3,
+        likes = 1_321_555
     )
 
     private val mockedPuzzle2 = Puzzle(
@@ -32,7 +33,8 @@ class PuzzleRemoteDataSourceImpl @Inject constructor(
         imageUrl = "R.drawable.sample_puzzle2",
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -1) },
         rows = 3,
-        columns = 3
+        columns = 3,
+        likes = 358_120
     )
 
     private val mockedPuzzle3 = Puzzle(
@@ -40,7 +42,8 @@ class PuzzleRemoteDataSourceImpl @Inject constructor(
         imageUrl = "R.drawable.sample_puzzle3",
         date = Calendar.getInstance(),
         rows = 3,
-        columns = 3
+        columns = 3,
+        likes = 10_544
     )
 
     private val recentPuzzles = listOf(mockedPuzzle1, mockedPuzzle2, mockedPuzzle3)

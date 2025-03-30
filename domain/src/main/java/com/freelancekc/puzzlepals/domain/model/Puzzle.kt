@@ -8,4 +8,5 @@ data class Puzzle(
     val date: Calendar,
     val rows: Int,
     val columns: Int,
+    val likes: Long = 0
 ) 

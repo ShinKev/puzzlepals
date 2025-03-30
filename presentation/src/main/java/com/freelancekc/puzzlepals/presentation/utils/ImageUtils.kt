@@ -29,6 +29,7 @@ suspend fun getBitmapFromUrl(context: Context, imageUrl: String?): Bitmap? {
     return withContext(Dispatchers.IO) {
         if (imageUrl.startsWith("R.drawable.")) {
             // Handle resource ID format
+            // This code is only for prototype purpose since we want to use local images
             getBitmapFromResource(context, imageUrl)
         } else {
             // Handle URI format
