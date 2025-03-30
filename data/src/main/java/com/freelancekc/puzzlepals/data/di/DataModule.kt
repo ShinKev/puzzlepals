@@ -1,4 +1,4 @@
-package com.freelancekc.puzzlepals.di
+package com.freelancekc.puzzlepals.data.di
 
 import com.freelancekc.puzzlepals.data.repository.PuzzleRepositoryImpl
 import com.freelancekc.puzzlepals.domain.repository.PuzzleRepository
@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AppModule {
+abstract class DataModule {
     
     @Binds
     @Singleton
