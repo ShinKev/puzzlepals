@@ -14,17 +14,23 @@ class PuzzleRepositoryImpl @Inject constructor() : PuzzleRepository {
             Puzzle(
                 id = "1",
                 imageUrl = "https://example.com/puzzle1.jpg",
-                date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -2) }
+                date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -2) },
+                rows = 5,
+                columns = 5
             ),
             Puzzle(
                 id = "2",
                 imageUrl = "https://example.com/puzzle2.jpg",
-                date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -1) }
+                date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -1) },
+                rows = 5,
+                columns = 5
             ),
             Puzzle(
                 id = "3",
                 imageUrl = "https://example.com/puzzle3.jpg",
-                date = Calendar.getInstance()
+                date = Calendar.getInstance(),
+                rows = 5,
+                columns = 5
             )
         )
         emit(puzzles)
