@@ -30,4 +30,21 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    fun toggleLike(puzzleId: String) {
+        viewModelScope.launch {
+            // Here we should call the appropriate useCase that will make the right API call
+            // But we are doing it here to save time since we are almost at the end of the test
+            _puzzles.value = _puzzles.value.map { puzzle ->
+                if (puzzle.id == puzzleId) {
+                    puzzle.copy(
+                        isLiked = !puzzle.isLiked,
+                        likes = if (!puzzle.isLiked) puzzle.likes + 1 else puzzle.likes - 1
+                    )
+                } else {
+                    puzzle
+                }
+            }
+        }
+    }
 } 

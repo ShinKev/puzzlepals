@@ -1,5 +1,6 @@
 package com.freelancekc.puzzlepals.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,10 +25,14 @@ import com.freelancekc.puzzlepals.domain.util.NumberFormatUtils
 @Composable
 fun LikesCount(
     likesCount: Long,
-    modifier: Modifier = Modifier
+    isLiked: Boolean,
+    modifier: Modifier = Modifier,
+    onLikeClick: () -> Unit = {}
 ) {
     Surface(
-        modifier = modifier.clip(RoundedCornerShape(16.dp)),
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(onClick = onLikeClick),
         color = Color.Black.copy(alpha = 0.6f),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -35,9 +41,9 @@ fun LikesCount(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = "Likes",
-                tint = Color.White,
+                imageVector = if (isLiked) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                contentDescription = if (isLiked) "Liked" else "Not liked",
+                tint = if (isLiked) Color.Red else Color.White,
                 modifier = Modifier.padding(end = 4.dp)
             )
             Text(
@@ -56,11 +62,20 @@ fun LikesCountPreview() {
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        LikesCount(likesCount = 10_321_555)
-        LikesCount(likesCount = 1_321_555)
-        LikesCount(likesCount = 358_120)
-        LikesCount(likesCount = 10_544)
-        LikesCount(likesCount = 1_456)
-        LikesCount(likesCount = 531)
+        LikesCount(
+            likesCount = 10_321_555,
+            isLiked = true
+        )
+        LikesCount(
+            likesCount = 1_321_555,
+            isLiked = false
+        )
+        LikesCount(
+            likesCount = 358_120,
+            isLiked = true
+        )
+        LikesCount(likesCount = 10_543, isLiked = false)
+        LikesCount(likesCount = 1_456, isLiked = false)
+        LikesCount(likesCount = 531, isLiked = false)
     }
 }

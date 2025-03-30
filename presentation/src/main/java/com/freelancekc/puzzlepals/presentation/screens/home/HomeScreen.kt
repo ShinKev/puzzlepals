@@ -49,6 +49,7 @@ fun HomeScreen(
         selectedDate = selectedDate,
         currentPage = currentPage,
         onNavigateToPuzzle = onNavigateToPuzzle,
+        onLikeClick = { puzzleId -> viewModel.toggleLike(puzzleId) },
         setShowDatePicker = { showDatePicker = it },
         setShowPremiumDialog = { showPremiumDialog = it },
         setSelectedDate = { selectedDate = it },
@@ -88,6 +89,7 @@ private fun HomeContent(
     selectedDate: Calendar,
     currentPage: Int,
     onNavigateToPuzzle: (String) -> Unit = {},
+    onLikeClick: (String) -> Unit = {},
     setShowDatePicker: (Boolean) -> Unit = {},
     setShowPremiumDialog: (Boolean) -> Unit = {},
     setSelectedDate: (Calendar) -> Unit = {},
@@ -129,6 +131,7 @@ private fun HomeContent(
                     setCurrentPage(page)
                     setSelectedDate(puzzles[page].date)
                 },
+                onLikeClick = onLikeClick,
                 modifier = Modifier.weight(1f)
             )
 
@@ -171,7 +174,8 @@ fun HomeContentPreview() {
                 date = Calendar.getInstance(),
                 rows = 3,
                 columns = 3,
-                likes = 42
+                likes = 42,
+                isLiked = true
             ),
             Puzzle(
                 id = "2",
@@ -179,7 +183,8 @@ fun HomeContentPreview() {
                 date = Calendar.getInstance(),
                 rows = 3,
                 columns = 3,
-                likes = 15
+                likes = 15,
+                isLiked = false
             ),
             Puzzle(
                 id = "3",
@@ -187,7 +192,8 @@ fun HomeContentPreview() {
                 date = Calendar.getInstance(),
                 rows = 3,
                 columns = 3,
-                likes = 7
+                likes = 7,
+                isLiked = true
             )
         )
     }
@@ -196,7 +202,8 @@ fun HomeContentPreview() {
         HomeContent(
             puzzles = samplePuzzles,
             selectedDate = Calendar.getInstance(),
-            currentPage = 1
+            currentPage = 1,
+            onLikeClick = {}
         )
     }
 }

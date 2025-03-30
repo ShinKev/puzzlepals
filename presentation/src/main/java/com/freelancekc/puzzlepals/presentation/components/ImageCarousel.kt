@@ -6,21 +6,16 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,14 +25,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.freelancekc.puzzlepals.domain.model.Puzzle
-import com.freelancekc.puzzlepals.domain.util.NumberFormatUtils
 import com.freelancekc.puzzlepals.presentation.R
 import com.freelancekc.puzzlepals.presentation.utils.getBitmapFromUrl
 
@@ -47,6 +40,7 @@ fun ImageCarousel(
     puzzles: List<Puzzle>,
     currentPage: Int,
     onPageChanged: (Int) -> Unit,
+    onLikeClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(initialPage = currentPage) {
@@ -78,7 +72,8 @@ fun ImageCarousel(
             PuzzlePager(
                 pagerState = pagerState,
                 puzzles = puzzles,
-                bitmapList = bitmapList
+                bitmapList = bitmapList,
+                onLikeClick = onLikeClick
             )
         } else {
             CircularProgressIndicator()
@@ -91,7 +86,8 @@ fun ImageCarousel(
 private fun BoxScope.PuzzlePager(
     pagerState: PagerState,
     puzzles: List<Puzzle>,
-    bitmapList: List<Bitmap?> = emptyList()
+    bitmapList: List<Bitmap?> = emptyList(),
+    onLikeClick: (String) -> Unit
 ) {
     HorizontalPager(
         state = pagerState,
@@ -123,7 +119,9 @@ private fun BoxScope.PuzzlePager(
                     modifier = Modifier
                         .align(alignment = Alignment.TopStart)
                         .padding(12.dp),
-                    likesCount = puzzles[page].likes
+                    likesCount = puzzles[page].likes,
+                    isLiked = puzzles[page].isLiked,
+                    onLikeClick = { onLikeClick(puzzles[page].id) }
                 )
             }
         }
@@ -151,7 +149,8 @@ fun PuzzlePagerPreview() {
                 date = java.util.Calendar.getInstance(),
                 rows = 3,
                 columns = 3,
-                likes = 1_321_555
+                likes = 1_321_555,
+                isLiked = true
             ),
             Puzzle(
                 id = "2",
@@ -159,7 +158,8 @@ fun PuzzlePagerPreview() {
                 date = java.util.Calendar.getInstance(),
                 rows = 3,
                 columns = 3,
-                likes = 358_120
+                likes = 358_120,
+                isLiked = false
             ),
             Puzzle(
                 id = "3",
@@ -167,7 +167,8 @@ fun PuzzlePagerPreview() {
                 date = java.util.Calendar.getInstance(),
                 rows = 3,
                 columns = 3,
-                likes = 10_544
+                likes = 10_543,
+                isLiked = true
             )
         )
     }
@@ -186,7 +187,8 @@ fun PuzzlePagerPreview() {
         PuzzlePager(
             pagerState = pagerState,
             puzzles = puzzles,
-            bitmapList = bitmapList
+            bitmapList = bitmapList,
+            onLikeClick = {}
         )
     }
 } 
