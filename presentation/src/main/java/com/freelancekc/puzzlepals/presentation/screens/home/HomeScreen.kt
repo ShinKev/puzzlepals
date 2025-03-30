@@ -171,7 +171,7 @@ private fun calculatePageForDate(date: Calendar, puzzlesSize: Int): Int {
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
+fun HomeContentPreview() {
     MaterialTheme {
         HomeContent(
             puzzles = listOf(),

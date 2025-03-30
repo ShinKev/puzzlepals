@@ -1,6 +1,9 @@
 package com.freelancekc.puzzlepals.presentation.screens.creation
 
 import android.Manifest
+import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,9 +34,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.freelancekc.puzzlepals.domain.model.Puzzle
 import com.freelancekc.puzzlepals.presentation.components.PuzzleCard
 import com.freelancekc.puzzlepals.presentation.utils.rememberCameraLauncherWithPermission
 import com.freelancekc.puzzlepals.presentation.utils.rememberGalleryLauncher
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,72 +75,139 @@ fun CreationScreen(
             )
         },
         floatingActionButton = {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FloatingActionButton(
-                    onClick = { galleryLauncher.launch("image/*") },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ) {
-                    Icon(
-                        Icons.Default.PhotoLibrary,
-                        contentDescription = "Choose from gallery"
-                    )
-                }
-                FloatingActionButton(
-                    onClick = { cameraLauncher.launch(Manifest.permission.CAMERA) },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ) {
-                    Icon(
-                        Icons.Default.AddAPhoto,
-                        contentDescription = "Take a photo"
-                    )
-                }
-            }
+            CreationFloatingActionButtons(
+                galleryLauncher = galleryLauncher,
+                cameraLauncher = cameraLauncher
+            )
         }
     ) { paddingValues ->
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            if (creations.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "No creations yet",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+        CreationContent(
+            creations = creations,
+            paddingValues = paddingValues,
+            modifier = modifier,
+            onNavigateToPuzzle = onNavigateToPuzzle
+        )
+    }
+}
+
+@Composable
+private fun CreationContent(
+    creations: List<Puzzle>,
+    modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(),
+    onNavigateToPuzzle: (String) -> Unit = {}
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        if (creations.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "No creations yet",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(creations) { puzzle ->
+                    PuzzleCard(
+                        puzzle = puzzle,
+                        onClick = { onNavigateToPuzzle(puzzle.id) }
                     )
-                }
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(creations) { puzzle ->
-                        PuzzleCard(
-                            puzzle = puzzle,
-                            onClick = { onNavigateToPuzzle(puzzle.id) }
-                        )
-                    }
                 }
             }
         }
     }
 }
 
+@Composable
+private fun CreationFloatingActionButtons(
+    galleryLauncher: ManagedActivityResultLauncher<String, Uri?>? = null,
+    cameraLauncher: ActivityResultLauncher<String>? = null
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FloatingActionButton(
+            onClick = { galleryLauncher?.launch("image/*") },
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ) {
+            Icon(
+                Icons.Default.PhotoLibrary,
+                contentDescription = "Choose from gallery"
+            )
+        }
+        FloatingActionButton(
+            onClick = { cameraLauncher?.launch(Manifest.permission.CAMERA) },
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ) {
+            Icon(
+                Icons.Default.AddAPhoto,
+                contentDescription = "Take a photo"
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
-fun CreationScreenPreview() {
+fun CreationContentNoDataPreview() {
     MaterialTheme {
-        CreationScreen()
+        CreationContent(creations = emptyList())
     }
-} 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CreationContentPreview() {
+    // Mock data for prototype
+    val mockedPuzzle1 = Puzzle(
+        id = "1",
+        imageUrl = "imageUrl1",
+        date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -2) },
+        rows = 3,
+        columns = 3
+    )
+
+    val mockedPuzzle2 = Puzzle(
+        id = "2",
+        imageUrl = "imageUrl2",
+        date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -1) },
+        rows = 3,
+        columns = 3
+    )
+
+    val mockedPuzzle3 = Puzzle(
+        id = "3",
+        imageUrl = "imageUrl3",
+        date = Calendar.getInstance(),
+        rows = 3,
+        columns = 3
+    )
+
+    val creations = listOf(mockedPuzzle1, mockedPuzzle2, mockedPuzzle3)
+
+    MaterialTheme {
+        CreationContent(creations = creations)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FloatingActionButtonsPreview() {
+    CreationFloatingActionButtons()
+}
