@@ -1,5 +1,6 @@
 package com.freelancekc.puzzlepals.presentation.screens.home
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +40,7 @@ fun HomeScreen(
     onNavigateToPuzzle: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var showDatePicker by remember { mutableStateOf(false) }
     var showPremiumDialog by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
@@ -78,7 +81,10 @@ fun HomeScreen(
     if (showPremiumDialog) {
         PremiumSubscriptionDialog(
             onDismiss = { showPremiumDialog = false },
-            onSubscribe = { /* TODO: Handle subscription */ }
+            onSubscribe = {
+                Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show()
+                showPremiumDialog = false
+            }
         )
     }
 }
