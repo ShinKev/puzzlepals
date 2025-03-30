@@ -82,7 +82,9 @@ fun MainScreen() {
                     }
                 )
             ) {
-                PuzzleScreen()
+                PuzzleScreen(
+                    onNavigateBack = { navController.navigateUp() }
+                )
             }
         }
     }

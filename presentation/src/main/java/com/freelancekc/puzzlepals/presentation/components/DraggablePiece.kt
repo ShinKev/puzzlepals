@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -16,13 +17,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.freelancekc.puzzlepals.domain.model.Coordinates
 import com.freelancekc.puzzlepals.domain.model.PuzzlePiece
@@ -52,7 +53,7 @@ fun DraggablePiece(
     )
     val snapThreshold = pieceDiagonalLength * SNAP_TOLERANCE
 
-    Box(
+    Surface(
         modifier = modifier
             .size(widthDp, heightDp)
             .zIndex(if (isLocked) 0f else 1f)  // Locked pieces go to the back
@@ -88,7 +89,9 @@ fun DraggablePiece(
                         offsetY += dragAmount.y
                     }
                 }
-            }
+            },
+        tonalElevation = if (isLocked) 0.dp else 4.dp,
+        shadowElevation = if (isLocked) 0.dp else 4.dp
     ) {
         Image(
             bitmap = piece.bitmap.asImageBitmap(),
