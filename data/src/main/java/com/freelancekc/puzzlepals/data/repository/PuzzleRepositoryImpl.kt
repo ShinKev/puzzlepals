@@ -32,6 +32,8 @@ class PuzzleRepositoryImpl @Inject constructor() : PuzzleRepository {
         columns = 3
     )
 
+    private val userCreations = mutableListOf(mockedPuzzle1, mockedPuzzle2)
+
     override fun getRecentPuzzles(): Flow<List<Puzzle>> = flow {
         // Mock data
         val puzzles = listOf(mockedPuzzle1, mockedPuzzle2, mockedPuzzle3)
@@ -46,5 +48,15 @@ class PuzzleRepositoryImpl @Inject constructor() : PuzzleRepository {
             "3" -> mockedPuzzle3
             else -> null
         }
+    }
+
+    override fun getUserCreations(): Flow<List<Puzzle>> = flow {
+        // Mock data - in a real app, this would fetch from a database or API
+        emit(userCreations)
+    }
+
+    override suspend fun createPuzzle(puzzle: Puzzle) {
+        // Mock data - in a real app, this would save to a database or API
+        userCreations.add(0, puzzle)
     }
 } 

@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface PuzzleRepository {
     fun getRecentPuzzles(): Flow<List<Puzzle>>
     suspend fun getPuzzleById(id: String): Puzzle?
+    fun getUserCreations(): Flow<List<Puzzle>>
+    suspend fun createPuzzle(puzzle: Puzzle)
 } 
