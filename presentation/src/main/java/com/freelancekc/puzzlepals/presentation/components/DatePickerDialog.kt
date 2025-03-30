@@ -9,31 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.freelancekc.puzzlepals.domain.util.toCalendar
 import java.util.Calendar
-
-private fun Calendar.toEpochMillis(): Long {
-    return this.timeInMillis
-}
-
-private fun Long.toCalendar(): Calendar {
-    return Calendar.getInstance().apply {
-        timeInMillis = this@toCalendar
-    }
-}
-
-private fun Calendar.isOlderThanThreeDays(): Boolean {
-    val twoDaysAgo = Calendar.getInstance().apply {
-        add(Calendar.DAY_OF_MONTH, -3)
-    }
-    return this.timeInMillis < twoDaysAgo.timeInMillis
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,14 +21,11 @@ fun DatePickerDialog(
     showDialog: Boolean,
     selectedDate: Calendar,
     onDismiss: () -> Unit,
-    onDateSelected: (Calendar) -> Unit,
-    onSubscribeToPremium: () -> Unit
+    onDateSelected: (Calendar) -> Unit
 ) {
-    var showPremiumDialog by remember { mutableStateOf(false) }
-
     if (showDialog) {
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = selectedDate.toEpochMillis(),
+            initialSelectedDateMillis = selectedDate.timeInMillis,
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                     return utcTimeMillis <= Calendar.getInstance().timeInMillis
@@ -62,12 +39,7 @@ fun DatePickerDialog(
                 TextButton(
                     onClick = {
                         datePickerState.selectedDateMillis?.let { millis ->
-                            val selectedCalendar = millis.toCalendar()
-                            if (selectedCalendar.isOlderThanThreeDays()) {
-                                showPremiumDialog = true
-                            } else {
-                                onDateSelected(selectedCalendar)
-                            }
+                            onDateSelected(millis.toCalendar())
                         }
                         onDismiss()
                     }
@@ -89,16 +61,6 @@ fun DatePickerDialog(
             )
         }
     }
-
-    if (showPremiumDialog) {
-        PremiumSubscriptionDialog(
-            onDismiss = { showPremiumDialog = false },
-            onSubscribe = {
-                showPremiumDialog = false
-                onSubscribeToPremium()
-            }
-        )
-    }
 }
 
 @Preview(showBackground = true)
@@ -108,7 +70,6 @@ fun DatePickerDialogPreview() {
         showDialog = true,
         selectedDate = Calendar.getInstance(),
         onDismiss = {},
-        onDateSelected = {},
-        onSubscribeToPremium = {}
+        onDateSelected = {}
     )
 } 
