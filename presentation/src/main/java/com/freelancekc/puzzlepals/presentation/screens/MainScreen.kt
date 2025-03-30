@@ -10,14 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.freelancekc.puzzlepals.presentation.navigation.BottomNavItem
+import androidx.navigation.navArgument
+import com.freelancekc.puzzlepals.presentation.navigation.NavRoute
 import com.freelancekc.puzzlepals.presentation.screens.creation.CreationScreen
 import com.freelancekc.puzzlepals.presentation.screens.feed.FeedAndSearchScreen
 import com.freelancekc.puzzlepals.presentation.screens.home.HomeScreen
+import com.freelancekc.puzzlepals.presentation.screens.puzzle.PuzzleScreen
 import com.freelancekc.puzzlepals.presentation.screens.profile.ProfileScreen
 
 @Composable
@@ -30,9 +33,9 @@ fun MainScreen() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
                 
-                BottomNavItem.items.forEach { item ->
+                NavRoute.bottomNavItems.forEach { item ->
                     NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.title) },
+                        icon = { Icon(item.icon!!, contentDescription = item.title) },
                         label = { Text(item.title) },
                         selected = currentRoute == item.route,
                         onClick = {
@@ -51,20 +54,35 @@ fun MainScreen() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = BottomNavItem.Home.route,
+            startDestination = NavRoute.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(BottomNavItem.Home.route) {
-                HomeScreen()
+            composable(NavRoute.Home.route) {
+                HomeScreen(
+                    onNavigateToPuzzle = { puzzleId ->
+                        navController.navigate(NavRoute.Puzzle.createRoute(puzzleId))
+                    }
+                )
             }
-            composable(BottomNavItem.Browse.route) {
+            composable(NavRoute.Browse.route) {
                 FeedAndSearchScreen()
             }
-            composable(BottomNavItem.Create.route) {
+            composable(NavRoute.Create.route) {
                 CreationScreen()
             }
-            composable(BottomNavItem.Profile.route) {
+            composable(NavRoute.Profile.route) {
                 ProfileScreen()
+            }
+            composable(
+                route = NavRoute.Puzzle("").route,
+                arguments = listOf(
+                    navArgument("puzzleId") {
+                        type = NavType.StringType
+                        nullable = false
+                    }
+                )
+            ) { backStackEntry ->
+                PuzzleScreen(backStackEntry = backStackEntry)
             }
         }
     }

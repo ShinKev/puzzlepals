@@ -7,37 +7,46 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class BottomNavItem(
+sealed class NavRoute(
     val route: String,
     val title: String,
-    val icon: ImageVector
+    val icon: ImageVector? = null
 ) {
-    data object Home : BottomNavItem(
+    data object Home : NavRoute(
         route = "home",
         title = "Home",
         icon = Icons.Default.Home
     )
     
-    data object Browse : BottomNavItem(
+    data object Browse : NavRoute(
         route = "browse",
         title = "Browse",
         icon = Icons.Default.Search
     )
     
-    data object Create : BottomNavItem(
+    data object Create : NavRoute(
         route = "create",
         title = "Create",
         icon = Icons.Default.Create
     )
     
-    data object Profile : BottomNavItem(
+    data object Profile : NavRoute(
         route = "profile",
         title = "Profile",
         icon = Icons.Default.Person
     )
+
+    data class Puzzle(val puzzleId: String) : NavRoute(
+        route = "puzzle/{puzzleId}",
+        title = "Puzzle"
+    ) {
+        companion object {
+            fun createRoute(puzzleId: String) = "puzzle/$puzzleId"
+        }
+    }
     
     companion object {
-        val items = listOf(
+        val bottomNavItems = listOf(
             Home,
             Browse,
             Create,

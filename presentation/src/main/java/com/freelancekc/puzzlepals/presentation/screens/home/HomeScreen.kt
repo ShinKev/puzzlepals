@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.freelancekc.puzzlepals.domain.model.Puzzle
 import com.freelancekc.puzzlepals.domain.util.isOlderThanThreeDays
 import com.freelancekc.puzzlepals.domain.util.setToMidnight
 import com.freelancekc.puzzlepals.presentation.R
@@ -34,6 +35,7 @@ import java.util.Calendar
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    onNavigateToPuzzle: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
@@ -42,71 +44,17 @@ fun HomeScreen(
     val puzzles by viewModel.puzzles.collectAsStateWithLifecycle()
     var currentPage by remember { mutableIntStateOf(puzzles.size - 1) }
 
-    // Offline images to be able to display something
-    val sampleImages = remember {
-        listOf(
-            R.drawable.sample_puzzle1,
-            R.drawable.sample_puzzle2,
-            R.drawable.sample_puzzle3
-        )
-    }
-
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CalendarButton(
-                    onClick = { showDatePicker = true },
-                    modifier = Modifier.padding(end = 12.dp)
-                )
-            }
-
-            DateDisplay(
-                date = selectedDate,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            ImageCarousel(
-                images = sampleImages, // should be puzzles.map { it.imageUrl },
-                currentPage = currentPage,
-                onPageChanged = { page ->
-                    currentPage = page
-                    selectedDate = puzzles[page].date
-                },
-                modifier = Modifier.weight(1f)
-            )
-
-            PlayButton(
-                onClick = {
-                    // Check if the selected puzzle is from today
-                    val today = Calendar.getInstance()
-                    today.setToMidnight()
-
-                    val selectedPuzzleDate = puzzles[currentPage].date.clone() as Calendar
-                    selectedPuzzleDate.setToMidnight()
-
-                    if (selectedPuzzleDate.before(today)) {
-                        showPremiumDialog = true
-                    } else {
-                        // TODO: Navigate to puzzle screen
-                    }
-                },
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
-    }
+    HomeContent(
+        puzzles = puzzles,
+        selectedDate = selectedDate,
+        currentPage = currentPage,
+        onNavigateToPuzzle = onNavigateToPuzzle,
+        setShowDatePicker = { showDatePicker = it },
+        setShowPremiumDialog = { showPremiumDialog = it },
+        setSelectedDate = { selectedDate = it },
+        setCurrentPage = { currentPage = it },
+        modifier = modifier
+    )
 
     DatePickerDialog(
         showDialog = showDatePicker,
@@ -134,6 +82,86 @@ fun HomeScreen(
     }
 }
 
+@Composable
+private fun HomeContent(
+    puzzles: List<Puzzle>,
+    selectedDate: Calendar,
+    currentPage: Int,
+    onNavigateToPuzzle: (String) -> Unit = {},
+    setShowDatePicker: (Boolean) -> Unit = {},
+    setShowPremiumDialog: (Boolean) -> Unit = {},
+    setSelectedDate: (Calendar) -> Unit = {},
+    setCurrentPage: (Int) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    // Offline images to be able to display something
+    val sampleImages = remember {
+        listOf(
+            R.drawable.sample_puzzle1,
+            R.drawable.sample_puzzle2,
+            R.drawable.sample_puzzle3
+        )
+    }
+
+    Scaffold(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(vertical = 16.dp),
+        containerColor = MaterialTheme.colorScheme.background
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CalendarButton(
+                    onClick = { setShowDatePicker(true) },
+                    modifier = Modifier.padding(end = 12.dp)
+                )
+            }
+
+            DateDisplay(
+                date = selectedDate,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            ImageCarousel(
+                images = sampleImages, // should be puzzles.map { it.imageUrl },
+                currentPage = currentPage,
+                onPageChanged = { page ->
+                    setCurrentPage(page)
+                    setSelectedDate(puzzles[page].date)
+                },
+                modifier = Modifier.weight(1f)
+            )
+
+            PlayButton(
+                onClick = {
+                    // Check if the selected puzzle is from today
+                    val today = Calendar.getInstance()
+                    today.setToMidnight()
+
+                    val selectedPuzzleDate = puzzles[currentPage].date.clone() as Calendar
+                    selectedPuzzleDate.setToMidnight()
+
+                    if (selectedPuzzleDate.before(today)) {
+                        setShowPremiumDialog(true)
+                    } else {
+                        onNavigateToPuzzle(puzzles[currentPage].id)
+                    }
+                },
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+    }
+}
+
 private fun calculatePageForDate(date: Calendar, puzzlesSize: Int): Int {
     val today = Calendar.getInstance()
     val diffInMillis = today.timeInMillis - date.timeInMillis
@@ -145,6 +173,10 @@ private fun calculatePageForDate(date: Calendar, puzzlesSize: Int): Int {
 @Composable
 fun HomeScreenPreview() {
     MaterialTheme {
-        HomeScreen()
+        HomeContent(
+            puzzles = listOf(),
+            selectedDate = Calendar.getInstance(),
+            currentPage = 1
+        )
     }
 }
