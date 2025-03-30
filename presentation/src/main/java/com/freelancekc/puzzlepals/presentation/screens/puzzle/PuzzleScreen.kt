@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -53,6 +51,7 @@ import com.freelancekc.puzzlepals.presentation.R
 import com.freelancekc.puzzlepals.presentation.components.CongratsDialog
 import com.freelancekc.puzzlepals.presentation.components.DraggablePiece
 import com.freelancekc.puzzlepals.presentation.utils.PuzzleGenerator
+import com.freelancekc.puzzlepals.presentation.utils.getBitmapFromUrl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,13 +74,7 @@ fun PuzzleScreen(
 
     // Load bitmap image
     LaunchedEffect(puzzle) {
-        try {
-            // Local image instead of URL since this is a prototype
-            val drawable = context.getDrawable(R.drawable.sample_puzzle3)
-            bitmap = (drawable as BitmapDrawable).bitmap
-        } catch (e: Exception) {
-            // Handle error
-        }
+        bitmap = getBitmapFromUrl(context, puzzle?.imageUrl)
     }
 
     // Generate puzzle pieces
@@ -105,7 +98,7 @@ fun PuzzleScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Daily Puzzle",
+                        text = "Puzzle Game",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -148,6 +141,7 @@ fun PuzzleScreen(
                         )
                     }
                 }
+
                 error != null -> {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -160,6 +154,7 @@ fun PuzzleScreen(
                         )
                     }
                 }
+
                 puzzle != null -> {
                     PuzzleContent(
                         puzzlePieces = puzzlePieces,

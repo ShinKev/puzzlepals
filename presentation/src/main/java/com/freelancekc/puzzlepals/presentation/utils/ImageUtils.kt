@@ -1,51 +1,66 @@
 package com.freelancekc.puzzlepals.presentation.utils
 
+import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.InputStream
 
-class ImagePicker(private val context: Context) {
-    private var onImageSelected: ((Uri) -> Unit)? = null
+suspend fun getBitmapFromUrl(context: Context, imageUrl: String?): Bitmap? {
+    if (imageUrl == null) return null
 
-    fun pickFromGallery(onImageSelected: (Uri) -> Unit) {
-        this.onImageSelected = onImageSelected
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        intent.type = "image/*"
-        intent.action = Intent.ACTION_GET_CONTENT
-        context.startActivity(intent)
-    }
-
-    fun pickFromCamera(onImageSelected: (Uri) -> Unit) {
-        this.onImageSelected = onImageSelected
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        context.startActivity(intent)
-    }
-
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == android.app.Activity.RESULT_OK) {
-            val uri = when (requestCode) {
-                GALLERY_REQUEST_CODE -> data?.data
-                CAMERA_REQUEST_CODE -> {
-                    // In a real app, we would save the camera image to a file and get its URI
-                    data?.data
-                }
-                else -> null
-            }
-            uri?.let { onImageSelected?.invoke(it) }
+    return withContext(Dispatchers.IO) {
+        if (imageUrl.startsWith("R.drawable.")) {
+            // Handle resource ID format
+            getBitmapFromResource(context, imageUrl)
+        } else {
+            // Handle URI format
+            getBitmapFromUri(context, imageUrl.toUri())
         }
     }
+}
 
-    companion object {
-        const val GALLERY_REQUEST_CODE = 1001
-        const val CAMERA_REQUEST_CODE = 1002
+private fun getBitmapFromResource(context: Context, imageUrl: String): Bitmap? {
+    val resourceName = imageUrl.substringAfter("R.drawable.")
+    val resourceId = context.resources.getIdentifier(
+        resourceName,
+        "drawable",
+        context.packageName
+    )
+
+    return if (resourceId != 0) {
+        try {
+            BitmapFactory.decodeResource(context.resources, resourceId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    } else null
+}
+
+private fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+    val contentResolver: ContentResolver = context.contentResolver
+    var inputStream: InputStream? = null
+
+    return try {
+        inputStream = contentResolver.openInputStream(uri)
+        BitmapFactory.decodeStream(inputStream)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    } finally {
+        inputStream?.close()
     }
 }
 

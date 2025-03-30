@@ -68,7 +68,11 @@ fun MainScreen() {
                 FeedAndSearchScreen()
             }
             composable(NavRoute.Create.route) {
-                CreationScreen()
+                CreationScreen(
+                    onNavigateToPuzzle = { puzzleId ->
+                        navController.navigate(NavRoute.Puzzle.createRoute(puzzleId))
+                    }
+                )
             }
             composable(NavRoute.Profile.route) {
                 ProfileScreen()
