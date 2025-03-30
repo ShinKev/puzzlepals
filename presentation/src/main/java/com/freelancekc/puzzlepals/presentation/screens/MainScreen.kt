@@ -81,8 +81,8 @@ fun MainScreen() {
                         nullable = false
                     }
                 )
-            ) { backStackEntry ->
-                PuzzleScreen(backStackEntry = backStackEntry)
+            ) {
+                PuzzleScreen()
             }
         }
     }
