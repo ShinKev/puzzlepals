@@ -27,6 +27,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.freelancekc.puzzlepals.domain.model.Puzzle
+import com.freelancekc.puzzlepals.presentation.components.DimensionsDialog
 import com.freelancekc.puzzlepals.presentation.components.PuzzleCard
 import com.freelancekc.puzzlepals.presentation.utils.rememberCameraLauncherWithPermission
 import com.freelancekc.puzzlepals.presentation.utils.rememberGalleryLauncher
@@ -48,13 +52,19 @@ fun CreationScreen(
     modifier: Modifier = Modifier
 ) {
     val creations by viewModel.creations.collectAsStateWithLifecycle()
+    var showDimensionsDialog by remember { mutableStateOf(false) }
+    var selectedUri by remember { mutableStateOf<Uri?>(null) }
+    var rows by remember { mutableStateOf(2f) }
+    var columns by remember { mutableStateOf(2f) }
 
     val galleryLauncher = rememberGalleryLauncher { uri ->
-        viewModel.handleImageSelected(uri)
+        selectedUri = uri
+        showDimensionsDialog = true
     }
 
     val cameraLauncher = rememberCameraLauncherWithPermission { uri ->
-        viewModel.handleImageSelected(uri)
+        selectedUri = uri
+        showDimensionsDialog = true
     }
 
     Scaffold(
@@ -86,6 +96,30 @@ fun CreationScreen(
             paddingValues = paddingValues,
             modifier = modifier,
             onNavigateToPuzzle = onNavigateToPuzzle
+        )
+    }
+
+    if (showDimensionsDialog) {
+        DimensionsDialog(
+            rows = rows,
+            columns = columns,
+            onRowsChange = { rows = it },
+            onColumnsChange = { columns = it },
+            onConfirm = {
+                selectedUri?.let { uri ->
+                    viewModel.handleImageSelected(uri, rows.toInt(), columns.toInt())
+                }
+                showDimensionsDialog = false
+                selectedUri = null
+                rows = 2f
+                columns = 2f
+            },
+            onDismiss = {
+                showDimensionsDialog = false
+                selectedUri = null
+                rows = 2f
+                columns = 2f
+            }
         )
     }
 }

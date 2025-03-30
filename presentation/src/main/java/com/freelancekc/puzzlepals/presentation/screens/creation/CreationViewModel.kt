@@ -36,14 +36,14 @@ class CreationViewModel @Inject constructor(
         }
     }
 
-    fun handleImageSelected(uri: Uri) {
+    fun handleImageSelected(uri: Uri, rows: Int, columns: Int) {
         viewModelScope.launch {
             val puzzle = Puzzle(
                 id = UUID.randomUUID().toString(),
                 imageUrl = uri.toString(),
                 date = Calendar.getInstance(),
-                rows = 3,
-                columns = 3
+                rows = rows,
+                columns = columns
             )
             createPuzzleUseCase(puzzle)
         }
