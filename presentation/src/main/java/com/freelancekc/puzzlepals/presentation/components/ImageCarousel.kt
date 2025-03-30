@@ -123,6 +123,14 @@ private fun BoxScope.PuzzlePager(
                     isLiked = puzzles[page].isLiked,
                     onLikeClick = { onLikeClick(puzzles[page].id) }
                 )
+
+                DimensionsText(
+                    rows = puzzles[page].rows,
+                    columns = puzzles[page].columns,
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopEnd)
+                        .padding(12.dp)
+                )
             }
         }
     }

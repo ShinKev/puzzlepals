@@ -52,7 +52,7 @@ fun PuzzleCard(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp),
-                contentAlignment = Alignment.BottomStart
+                contentAlignment = Alignment.TopEnd
             ) {
                 DimensionsText(
                     rows = puzzle.rows,
@@ -60,26 +60,6 @@ fun PuzzleCard(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun DimensionsText(
-    rows: Int,
-    columns: Int,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.clip(RoundedCornerShape(16.dp)),
-        color = Color.Black.copy(alpha = 0.6f),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Text(
-            text = "$rows x $columns",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.White,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-        )
     }
 }
 
