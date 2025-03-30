@@ -122,7 +122,7 @@ private fun HomeContent(
             ) {
                 CalendarButton(
                     onClick = { setShowDatePicker(true) },
-                    modifier = Modifier.padding(end = 12.dp)
+                    modifier = Modifier.padding(end = 24.dp)
                 )
             }
 

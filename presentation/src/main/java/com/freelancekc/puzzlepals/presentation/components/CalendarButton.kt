@@ -3,8 +3,9 @@ package com.freelancekc.puzzlepals.presentation.components
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,9 +16,10 @@ fun CalendarButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    FilledIconButton(
+    FloatingActionButton(
         onClick = onClick,
-        modifier = modifier.size(48.dp)
+        modifier = modifier.size(48.dp),
+        containerColor = MaterialTheme.colorScheme.primaryContainer
     ) {
         Icon(
             imageVector = Icons.Outlined.CalendarToday,
@@ -29,5 +31,7 @@ fun CalendarButton(
 @Preview(showBackground = true)
 @Composable
 fun CalendarButtonPreview() {
-    CalendarButton(onClick = {})
-} 
+    MaterialTheme {
+        CalendarButton(onClick = {})
+    }
+}

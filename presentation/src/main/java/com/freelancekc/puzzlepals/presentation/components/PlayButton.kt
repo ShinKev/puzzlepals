@@ -22,12 +22,13 @@ fun PlayButton(
             .fillMaxWidth()
             .padding(horizontal = 32.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
         Text(
             text = "Play",
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
 }
