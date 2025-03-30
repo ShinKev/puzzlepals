@@ -36,10 +36,10 @@ class PuzzleRepositoryImpl @Inject constructor() : PuzzleRepository {
 
     private val userCreations = mutableMapOf<String,Puzzle>()
     private val _userCreationsFlow = MutableSharedFlow<List<Puzzle>>(replay = 1, extraBufferCapacity = 1)
-    val userCreationsFlow = _userCreationsFlow.asSharedFlow()
+    private val userCreationsFlow = _userCreationsFlow.asSharedFlow()
 
     override fun getRecentPuzzles(): Flow<List<Puzzle>> = flow {
-        // Mock data
+        // Mock data - in a real app, this would fetch from a database or API
         val puzzles = listOf(mockedPuzzle1, mockedPuzzle2, mockedPuzzle3)
         emit(puzzles)
     }
