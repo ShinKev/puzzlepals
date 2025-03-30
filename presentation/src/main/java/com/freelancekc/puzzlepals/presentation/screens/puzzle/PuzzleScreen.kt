@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -48,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.freelancekc.puzzlepals.domain.model.PuzzlePiece
 import com.freelancekc.puzzlepals.presentation.R
+import com.freelancekc.puzzlepals.presentation.components.CongratsDialog
 import com.freelancekc.puzzlepals.presentation.components.DraggablePiece
 import com.freelancekc.puzzlepals.presentation.utils.PuzzleGenerator
 
@@ -60,6 +63,7 @@ fun PuzzleScreen(
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
+    var showCompletionDialog by remember { mutableStateOf(false) }
 
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var screenSize by remember { mutableStateOf(Size.Zero) }
@@ -161,10 +165,21 @@ fun PuzzleScreen(
                         puzzlePieces = puzzlePieces,
                         bitmap = bitmap,
                         imageSize = imageSize,
-                        setImageSize = { imageSize = it }
+                        setImageSize = { imageSize = it },
+                        onPuzzleCompleted = { showCompletionDialog = true }
                     )
                 }
             }
+        }
+
+        if (showCompletionDialog) {
+            CongratsDialog(
+                onDismiss = { showCompletionDialog = false },
+                onLeave = {
+                    showCompletionDialog = false
+                    onNavigateBack()
+                }
+            )
         }
     }
 }
@@ -174,7 +189,8 @@ private fun PuzzleContent(
     puzzlePieces: List<PuzzlePiece>,
     bitmap: Bitmap?,
     imageSize: Size,
-    setImageSize: (Size) -> Unit = {}
+    setImageSize: (Size) -> Unit = {},
+    onPuzzleCompleted: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -193,7 +209,10 @@ private fun PuzzleContent(
                     onSizeChanged = { setImageSize(it) }
                 )
                 if (imageSize != Size.Zero) {
-                    PuzzlePieces(pieces = puzzlePieces)
+                    PuzzlePieces(
+                        pieces = puzzlePieces,
+                        onPuzzleCompleted = onPuzzleCompleted
+                    )
                 }
             }
         }
@@ -225,9 +244,25 @@ private fun PuzzleBackground(
 }
 
 @Composable
-private fun PuzzlePieces(pieces: List<PuzzlePiece>) {
-    pieces.forEach { piece ->
-        DraggablePiece(piece = piece)
+private fun PuzzlePieces(
+    pieces: List<PuzzlePiece>,
+    onPuzzleCompleted: () -> Unit = {}
+) {
+    var lockedPieces by remember { mutableStateOf(setOf<Int>()) }
+
+    pieces.forEachIndexed { index, piece ->
+        DraggablePiece(
+            piece = piece,
+            onPiecePlaced = { isCorrect ->
+                if (isCorrect) {
+                    lockedPieces = lockedPieces + index
+                    // Check if all pieces are locked
+                    if (lockedPieces.size == pieces.size) {
+                        onPuzzleCompleted()
+                    }
+                }
+            }
+        )
     }
 }
 

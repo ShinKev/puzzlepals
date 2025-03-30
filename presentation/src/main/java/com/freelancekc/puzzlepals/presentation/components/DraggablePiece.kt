@@ -37,6 +37,7 @@ import kotlin.math.sqrt
 @Composable
 fun DraggablePiece(
     piece: PuzzlePiece,
+    onPiecePlaced: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var offsetX by remember { mutableFloatStateOf(0f) }
@@ -73,6 +74,7 @@ fun DraggablePiece(
                 // If close enough, snap to the win position and lock
                 if (shouldSnap && !isLocked) {
                     isLocked = true
+                    onPiecePlaced(true)
                 }
 
                 // If locked, use the win position, otherwise use current position
